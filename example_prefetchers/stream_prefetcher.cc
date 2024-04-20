@@ -69,101 +69,101 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
 
   int i;
   for(i=0; i<STREAM_DETECTOR_COUNT; i++)
-    {
-      if(detectors[i].page == page)
-	{
-	  detector_index = i;
-	  break;
-	}
-    }
+  {
+    if(detectors[i].page == page)
+	  {
+	    detector_index = i;
+	    break;
+	  }
+  }
 
   if(detector_index == -1)
-    {
-      // this is a new page that doesn't have a detector yet, so allocate one
-      detector_index = replacement_index;
-      replacement_index++;
-      if(replacement_index >= STREAM_DETECTOR_COUNT)
-	{
-	  replacement_index = 0;
-	}
+  {
+    // this is a new page that doesn't have a detector yet, so allocate one
+    detector_index = replacement_index;
+    replacement_index++;
+    if(replacement_index >= STREAM_DETECTOR_COUNT)
+	  {
+	    replacement_index = 0;
+	  }
 
-      // reset the oldest page
-      detectors[detector_index].page = page;
-      detectors[detector_index].direction = 0;
-      detectors[detector_index].confidence = 0;
-      detectors[detector_index].pf_index = page_offset;
-    }
+    // reset the oldest page
+    detectors[detector_index].page = page;
+    detectors[detector_index].direction = 0;
+    detectors[detector_index].confidence = 0;
+    detectors[detector_index].pf_index = page_offset;
+  }
 
   // train on the new access
   if(page_offset > detectors[detector_index].pf_index)
-    {
-      // accesses outside the STREAM_WINDOW do not train the detector
-      if((page_offset-detectors[detector_index].pf_index) < STREAM_WINDOW)
-	{
-	  if(detectors[detector_index].direction == -1)
+  {
+    // accesses outside the STREAM_WINDOW do not train the detector
+    if((page_offset-detectors[detector_index].pf_index) < STREAM_WINDOW)
+	  {
+	    if(detectors[detector_index].direction == -1)
 	    {
 	      // previously-set direction was wrong
 	      detectors[detector_index].confidence = 0;
 	    }
-	  else
+	    else
 	    {
 	      detectors[detector_index].confidence++;
 	    }
 
-	  // set the direction to +1
-	  detectors[detector_index].direction = 1;
-	}
-    }
+      // set the direction to +1
+      detectors[detector_index].direction = 1;
+	  }
+  }
   else if(page_offset < detectors[detector_index].pf_index)
-    {
-      // accesses outside the STREAM_WINDOW do not train the detector
-      if((detectors[detector_index].pf_index-page_offset) < STREAM_WINDOW)
-	{
-          if(detectors[detector_index].direction == 1)
-            {
+  {
+    // accesses outside the STREAM_WINDOW do not train the detector
+    if((detectors[detector_index].pf_index-page_offset) < STREAM_WINDOW)
+	  {
+      if(detectors[detector_index].direction == 1)
+      {
 	      // previously-set direction was wrong
 	      detectors[detector_index].confidence = 0;
-            }
-          else
-            {
+      }
+      else
+      {
 	      detectors[detector_index].confidence++;
-            }
+      }
 
-	  // set the direction to -1
-          detectors[detector_index].direction = -1;
-        }
+	    // set the direction to -1
+      detectors[detector_index].direction = -1;
     }
+  }
 
   // prefetch if confidence is high enough
   if(detectors[detector_index].confidence >= 2)
-    {
-      int i;
-      for(i=0; i<PREFETCH_DEGREE; i++)
-	{
-	  detectors[detector_index].pf_index += detectors[detector_index].direction;
+  {
+    int i;
+    for(i=0; i<PREFETCH_DEGREE; i++)
+	  {
+	    detectors[detector_index].pf_index += detectors[detector_index].direction;
 
-	  if((detectors[detector_index].pf_index < 0) || (detectors[detector_index].pf_index > 63))
+	    if((detectors[detector_index].pf_index < 0) || (detectors[detector_index].pf_index > 63))
 	    {
 	      // we've gone off the edge of a 4 KB page
 	      break;
 	    }
 
-	  // perform prefetches
-	  unsigned long long int pf_address = (page<<12)+((detectors[detector_index].pf_index)<<6);
-	  
-	  // check MSHR occupancy to decide whether to prefetch into the L2 or LLC
-	  if(get_l2_mshr_occupancy(0) > 8)
-	    {
-	      // conservatively prefetch into the LLC, because MSHRs are scarce
-	      l2_prefetch_line(0, addr, pf_address, FILL_LLC);
-	    }
-	  else
-	    {
-	      // MSHRs not too busy, so prefetch into L2
-	      l2_prefetch_line(0, addr, pf_address, FILL_L2);
-	    }
-	}
-    }
+      // perform prefetches
+      unsigned long long int pf_address = (page<<12)+((detectors[detector_index].pf_index)<<6);
+      
+      // check MSHR occupancy to decide whether to prefetch into the L2 or LLC
+      if(get_l2_mshr_occupancy(0) > 8)
+      {
+        // conservatively prefetch into the LLC, because MSHRs are scarce
+        l2_prefetch_line(0, addr, pf_address, FILL_LLC);
+      }
+      else
+      {
+        // MSHRs not too busy, so prefetch into L2
+        l2_prefetch_line(0, addr, pf_address, FILL_L2);
+      }
+	  }
+  }
 }
 
 void l2_cache_fill(int cpu_num, unsigned long long int addr, int set, int way, int prefetch, unsigned long long int evicted_addr)
