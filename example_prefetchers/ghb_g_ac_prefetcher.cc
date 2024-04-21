@@ -7,15 +7,13 @@
 #define PREFETCH_WIDTH 2
 #define PREFETCH_DEPTH 2
 
-GHB ghb;
+GHB ghb(GHB_LENGTH);
 
 
 void l2_prefetcher_initialize(int cpu_num)
 {
   // you can inspect these knob values from your code to see which configuration you're runnig in
   printf("Knobs visible from prefetcher: %d %d %d\n", knob_scramble_loads, knob_small_llc, knob_low_bandwidth);
-
-  ghb = GHB(GHB_LENGTH);
 }
 
 void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned long long int ip, int cache_hit)
@@ -32,7 +30,7 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
     std::vector<int> width_indices = ghb.get_entries_by_addr(addr, PREFETCH_WIDTH);
  
     // get depth
-    for (int i = 0; i < width_indices.size(); ++i) {
+    for (size_t i = 0; i < width_indices.size(); ++i) {
       int index = width_indices[i];
       for (int j = 0; j < PREFETCH_DEPTH; j++) {
         ghb_entry_t entry = ghb.get_entry_by_index((index - 1 - j) % GHB_LENGTH);
