@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include "../inc/prefetcher.h"
 #include "ghb.cc"
+#include <set>
 
-#define INDEX_TABLE_LENGTH 32
 #define GHB_LENGTH 124
+#define PREFETCH_WIDTH 2
+#define PREFETCH_DEPTH 2
 
 GHB ghb;
 
@@ -21,14 +23,30 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
   // uncomment this line to see all the information available to make prefetch decisions
   //printf("(0x%llx 0x%llx %d %d %d) ", addr, ip, cache_hit, get_l2_read_queue_occupancy(0), get_l2_mshr_occupancy(0));
 
-
   ghb.add_entry(addr);
 
+  if (!cache_hit) {
+    std::set<unsigned long long int> prefetch_addr_set;
 
-  // trigger if cache miss
+    // get width
+    std::vector<int> width_indices = ghb.get_entries_by_addr(addr, PREFETCH_WIDTH);
+ 
+    // get depth
+    for (int i = 0; i < width_indices.size(); ++i) {
+      int index = width_indices[i];
+      for (int j = 0; j < PREFETCH_DEPTH; j++) {
+        ghb_entry_t entry = ghb.get_entry_by_index((index - 1 - j) % GHB_LENGTH);
+        prefetch_addr_set.insert(entry.addr);
+      }
+    }
 
 
+    for (int prefetch_addr : prefetch_addr_set) {
+      l2_prefetch_line(0, addr, prefetch_addr, FILL_L2);
+    }
+  }
 
+  return;
 }
 
 void l2_cache_fill(int cpu_num, unsigned long long int addr, int set, int way, int prefetch, unsigned long long int evicted_addr)
