@@ -2,7 +2,7 @@
 all: dpc2sim-stream dpc2sim-ip-stride dpc2sim-next-line dpc2sim-ampm-lite dpc2sim-ghb-g-ac dpc2sim-skeleton
 
 run: dpc2sim-ghb-g-ac
-	zcat traces/mcf_trace2.dpc.gz | ./dpc2sim-ghb -simulation_instructions 100 -warmup_instructions 0
+	zcat traces/mcf_trace2.dpc.gz | ./dpc2sim-ghb
 
 dpc2sim-stream:
 	$(CXX) -Wall -no-pie -o dpc2sim-stream example_prefetchers/stream_prefetcher.cc lib/dpc2sim.a
