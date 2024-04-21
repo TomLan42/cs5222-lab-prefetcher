@@ -32,30 +32,8 @@ public:
     ~GHB() {}
 
     void add_entry(unsigned long long int addr) {
-      // Init new entry
-      ghb_entry_t entry;
-      entry.addr = addr;
-      // find the most recent element with the same addr
-      int last_ptr = -1;
-      for (int count = 0; count < size - 1; count++) {
-        int index = (head - 1 - count) % capacity;
-        if (buffer[index].addr == addr) {
-            last_ptr = index;
-            break;
-        }
-      }
-      entry.last_addr_ptr = last_ptr;
-
-
-      // Allocate new entry
+      // Remove overwritten entry
       ghb_entry_t replaced_entry =  buffer[head];
-      buffer[head] = entry;
-      head = (head + 1) % capacity;
-      if (size < capacity) {
-        size++;
-      }
-
-      // Update index table
       if (replaced_entry.addr != 0) {
         auto it = index_table.find(replaced_entry.addr);
         if (it != index_table.end()) {
@@ -66,15 +44,34 @@ public:
         }
       }
 
+      // Allocate new entry
+      ghb_entry_t entry;
+      entry.addr = addr;
+
       auto it = index_table.find(entry.addr);
       if (it != index_table.end()) {
+        entry.last_addr_ptr = it->second.addr_head_index;
+
         it->second.addr_chain_len++;
+        it->second.addr_head_index = head;
       } else {
+        entry.last_addr_ptr = -1;
+
         index_table_entry_t index_table_entry;
         index_table_entry.addr_chain_len = 1;
-        index_table_entry.addr_head_index = head - 1;
+        index_table_entry.addr_head_index = head;
         index_table[entry.addr] = index_table_entry;
       }
+
+      buffer[head] = entry;
+      head = (head + 1) % capacity;
+      if (size < capacity) {
+        size++;
+      }
+
+      // uncomment to check debug info
+      // print_buffer();
+      // print_index_table();
     }
 
     std::vector<int> get_entries_by_addr(unsigned long long int addr, int width) {
@@ -87,9 +84,9 @@ public:
 
       int cur_index = it->second.addr_head_index;
 
-      for (int i = 0; i < it->second.addr_chain_len && i < width; i++) {
+      for (int i = 0; i < (it->second.addr_chain_len - 1) && i < width; i++) {
+        cur_index = buffer[cur_index].last_addr_ptr;
         result.push_back(cur_index);
-        cur_index = buffer[i].last_addr_ptr;
       }
       return result;
     }
@@ -97,6 +94,24 @@ public:
     ghb_entry_t get_entry_by_index(int index) {
       return buffer[index];
     }
+
+    void print_buffer() {
+      std::cout << "Buffer contents:" << std::endl;
+      for (const auto& entry : buffer) {
+        std::cout << "Address: " << entry.addr << ", Last pointer: " << entry.last_addr_ptr << std::endl;
+      }
+      std::cout << "head: " << head << std::endl;
+      std::cout << "size: " << size << std::endl;
+    }
+
+    void print_index_table() {
+      std::cout << "Index table contents:" << std::endl;
+      for (const auto& pair : index_table) {
+        std::cout << "Addr: " << pair.first << ", Head: " << pair.second.addr_head_index <<  ", Chain len: " << pair.second.addr_chain_len <<  std::endl;
+      }
+      std::cout << "----------"  << std::endl;
+    }
+
 
     bool is_full() {
         return (size == capacity);

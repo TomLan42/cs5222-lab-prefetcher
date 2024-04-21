@@ -3,7 +3,7 @@
 #include "ghb.cc"
 #include <set>
 
-#define GHB_LENGTH 124
+#define GHB_LENGTH 128
 #define PREFETCH_WIDTH 2
 #define PREFETCH_DEPTH 2
 
@@ -23,12 +23,12 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
 
   ghb.add_entry(addr);
 
-  if (!cache_hit) {
+  if (true) {
     std::set<unsigned long long int> prefetch_addr_set;
 
     // get width
     std::vector<int> width_indices = ghb.get_entries_by_addr(addr, PREFETCH_WIDTH);
- 
+
     // get depth
     for (size_t i = 0; i < width_indices.size(); ++i) {
       int index = width_indices[i];
@@ -38,10 +38,15 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
       }
     }
 
-
     for (int prefetch_addr : prefetch_addr_set) {
       l2_prefetch_line(0, addr, prefetch_addr, FILL_L2);
     }
+
+
+    // std::cout << "prefetch_addr_set: "  << prefetch_addr_set.size() << "width: " << width_indices.size() << std::endl;
+    ghb.print_buffer();
+
+
   }
 
   return;
@@ -65,5 +70,7 @@ void l2_prefetcher_warmup_stats(int cpu_num)
 
 void l2_prefetcher_final_stats(int cpu_num)
 {
+  // ghb.print_index_table();
+  
   printf("Prefetcher final stats\n");
 }
