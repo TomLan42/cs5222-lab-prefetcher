@@ -3,9 +3,9 @@
 #include "ghb.cc"
 #include <set>
 
-#define GHB_LENGTH 1024
-#define PREFETCH_WIDTH 2
-#define PREFETCH_DEPTH 8
+#define GHB_LENGTH 2048
+#define PREFETCH_WIDTH 8
+#define PREFETCH_DEPTH 64
 
 GHB ghb(GHB_LENGTH);
 
@@ -19,11 +19,13 @@ void l2_prefetcher_initialize(int cpu_num)
 void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned long long int ip, int cache_hit)
 {
   // uncomment this line to see all the information available to make prefetch decisions
-  //printf("(0x%llx 0x%llx %d %d %d) ", addr, ip, cache_hit, get_l2_read_queue_occupancy(0), get_l2_mshr_occupancy(0));
+  // printf("(0x%llx 0x%llx %d %d %d) \n", addr, ip, cache_hit, get_l2_read_queue_occupancy(0), get_l2_mshr_occupancy(0));
 
-  ghb.add_entry(addr);
-
+ 
   if (!cache_hit) {
+
+    ghb.add_entry(addr);
+
     std::set<unsigned long long int> prefetch_addr_set;
 
     // get width
@@ -33,10 +35,13 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
     for (size_t i = 0; i < width_indices.size(); i++) {
       int index = width_indices[i];
       for (int j = 0; j < PREFETCH_DEPTH; j++) {
-        ghb_entry_t entry = ghb.get_entry_by_index((index - 1 + j) % GHB_LENGTH);
-        prefetch_addr_set.insert(entry.addr);
+        ghb_entry_t entry = ghb.get_entry_by_index((index + 1 + j) % GHB_LENGTH);
+        if (entry.addr != 0) {
+          prefetch_addr_set.insert(entry.addr);
+        }
       }
     }
+
 
     for (int prefetch_addr : prefetch_addr_set) {
       l2_prefetch_line(0, addr, prefetch_addr, FILL_L2);
@@ -65,6 +70,9 @@ void l2_prefetcher_warmup_stats(int cpu_num)
 void l2_prefetcher_final_stats(int cpu_num)
 {
   // ghb.print_index_table();
+
+
+  ghb.print_index_table_stats();
   
   printf("Prefetcher final stats\n");
 }

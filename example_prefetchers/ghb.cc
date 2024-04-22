@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <map>
+
 
 
 typedef struct index_table_entry {
@@ -110,6 +112,20 @@ public:
         std::cout << "Addr: " << pair.first << ", Head: " << pair.second.addr_head_index <<  ", Chain len: " << pair.second.addr_chain_len <<  std::endl;
       }
       std::cout << "----------"  << std::endl;
+    }
+
+
+    void print_index_table_stats() {
+      std::map<int, int> index_table_dist;
+
+      for (const auto& pair : index_table) {
+        index_table_dist[pair.second.addr_chain_len]++;
+      }
+
+      std::cout << "Index Table Dist contents:" << std::endl;
+      for (const auto& pair : index_table_dist) {
+        std::cout << "Key: " << pair.first << ", Value: " << pair.second << std::endl;
+      }
     }
 
 
