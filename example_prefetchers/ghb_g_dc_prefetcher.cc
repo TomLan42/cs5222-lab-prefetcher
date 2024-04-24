@@ -7,7 +7,7 @@
 #define PREFETCH_WIDTH 8
 #define PREFETCH_DEPTH 64
 
-GHB ghb(GHB_LENGTH, TYPE_G_AC);
+GHB ghb(GHB_LENGTH, TYPE_G_DC);
 
 
 void l2_prefetcher_initialize(int cpu_num)
@@ -37,7 +37,9 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
       for (int j = 0; j < PREFETCH_DEPTH; j++) {
         ghb_entry_t entry = ghb.get_entry_by_index((index + 1 + j) % GHB_LENGTH);
         if (entry.addr != 0) {
-          prefetch_addr_set.insert(entry.addr);
+          int delta = ghb.get_entry_by_index((index + 1 + j) % GHB_LENGTH).addr - ghb.get_entry_by_index(index).addr;
+          // TODO: fix typed addition
+          prefetch_addr_set.insert(entry.addr + delta);
         }
       }
     }
