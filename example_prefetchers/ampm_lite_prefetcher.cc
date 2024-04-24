@@ -19,6 +19,8 @@
 #define AMPM_PAGE_COUNT 64
 #define PREFETCH_DEGREE 2
 
+int issued_count;
+
 typedef struct ampm_page
 {
   // page address
@@ -160,10 +162,12 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
 	  if(get_l2_mshr_occupancy(0) < 8)
 	    {
 	      l2_prefetch_line(0, addr, pf_address, FILL_L2);
+        issued_count++;
 	    }
 	  else
 	    {
-	      l2_prefetch_line(0, addr, pf_address, FILL_LLC);	      
+	      l2_prefetch_line(0, addr, pf_address, FILL_LLC);
+        issued_count++;
 	    }
 
 	  // mark the prefetched line so we don't prefetch it again
@@ -217,10 +221,12 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
 	  if(get_l2_mshr_occupancy(0) < 12)
 	    {
 	      l2_prefetch_line(0, addr, pf_address, FILL_L2);
+        issued_count++;
 	    }
 	  else
 	    {
-	      l2_prefetch_line(0, addr, pf_address, FILL_LLC);	      
+	      l2_prefetch_line(0, addr, pf_address, FILL_LLC);
+        issued_count++;	      
 	    }
 
 	  // mark the prefetched line so we don't prefetch it again
@@ -249,4 +255,5 @@ void l2_prefetcher_warmup_stats(int cpu_num)
 void l2_prefetcher_final_stats(int cpu_num)
 {
   printf("Prefetcher final stats\n");
+  printf("prefetch count: %d\n", issued_count);
 }

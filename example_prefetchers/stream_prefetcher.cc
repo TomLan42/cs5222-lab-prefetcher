@@ -19,6 +19,8 @@
 #define STREAM_WINDOW 16
 #define PREFETCH_DEGREE 2
 
+int issued_count;
+
 typedef struct stream_detector
 {
   // which 4 KB page this detector is monitoring
@@ -156,11 +158,13 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
       {
         // conservatively prefetch into the LLC, because MSHRs are scarce
         l2_prefetch_line(0, addr, pf_address, FILL_LLC);
+        issued_count++;	      
       }
       else
       {
         // MSHRs not too busy, so prefetch into L2
         l2_prefetch_line(0, addr, pf_address, FILL_L2);
+        issued_count++;	      
       }
 	  }
   }
@@ -185,4 +189,5 @@ void l2_prefetcher_warmup_stats(int cpu_num)
 void l2_prefetcher_final_stats(int cpu_num)
 {
   printf("Prefetcher final stats\n");
+  printf("prefetch count: %d\n", issued_count);
 }

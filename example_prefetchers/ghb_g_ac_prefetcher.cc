@@ -3,12 +3,13 @@
 #include "ghb.cc"
 #include <set>
 
-#define GHB_LENGTH 2048
-#define PREFETCH_WIDTH 8
-#define PREFETCH_DEPTH 64
+#define GHB_LENGTH 1024
+#define PREFETCH_WIDTH 2
+#define PREFETCH_DEPTH 2
 
 GHB ghb(GHB_LENGTH);
 
+int issued_count;
 
 void l2_prefetcher_initialize(int cpu_num)
 {
@@ -26,26 +27,27 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
 
     ghb.add_entry(addr);
 
-    std::set<unsigned long long int> prefetch_addr_set;
+    // std::set<unsigned long long int> prefetch_addr_set;
 
-    // get width
-    std::vector<int> width_indices = ghb.get_entries_by_addr(addr, PREFETCH_WIDTH);
+    // // get width
+    // std::vector<int> width_indices = ghb.get_entries_by_addr(addr, PREFETCH_WIDTH);
 
-    // get depth
-    for (size_t i = 0; i < width_indices.size(); i++) {
-      int index = width_indices[i];
-      for (int j = 0; j < PREFETCH_DEPTH; j++) {
-        ghb_entry_t entry = ghb.get_entry_by_index((index + 1 + j) % GHB_LENGTH);
-        if (entry.addr != 0) {
-          prefetch_addr_set.insert(entry.addr);
-        }
-      }
-    }
+    // // get depth
+    // for (size_t i = 0; i < width_indices.size(); i++) {
+    //   int index = width_indices[i];
+    //   for (int j = 0; j < PREFETCH_DEPTH; j++) {
+    //     ghb_entry_t entry = ghb.get_entry_by_index((index + 1 + j) % GHB_LENGTH);
+    //     if (entry.addr != 0) {
+    //       prefetch_addr_set.insert(entry.addr);
+    //     }
+    //   }
+    // }
 
 
-    for (int prefetch_addr : prefetch_addr_set) {
-      l2_prefetch_line(0, addr, prefetch_addr, FILL_L2);
-    }
+    // for (int prefetch_addr : prefetch_addr_set) {
+    //   l2_prefetch_line(0, addr, prefetch_addr, FILL_L2);
+    //   issued_count++;
+    // }
   }
 
   return;
@@ -68,11 +70,10 @@ void l2_prefetcher_warmup_stats(int cpu_num)
 }
 
 void l2_prefetcher_final_stats(int cpu_num)
-{
-  // ghb.print_index_table();
+{  
+  printf("Prefetcher final stats\n");
 
+  printf("prefetch count: %d\n", issued_count);
 
   ghb.print_index_table_stats();
-  
-  printf("Prefetcher final stats\n");
 }

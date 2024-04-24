@@ -34,17 +34,17 @@ public:
     ~GHB() {}
 
     void add_entry(unsigned long long int addr) {
-      // Remove overwritten entry
-      ghb_entry_t replaced_entry =  buffer[head];
-      if (replaced_entry.addr != 0) {
-        auto it = index_table.find(replaced_entry.addr);
-        if (it != index_table.end()) {
-          it->second.addr_chain_len--;
-          if (it->second.addr_chain_len == 0) {
-            index_table.erase(replaced_entry.addr);
-          }
-        }
-      }
+      // // Remove overwritten entry
+      // ghb_entry_t replaced_entry =  buffer[head];
+      // if (replaced_entry.addr != 0) {
+      //   auto it = index_table.find(replaced_entry.addr);
+      //   if (it != index_table.end()) {
+      //     it->second.addr_chain_len--;
+      //     if (it->second.addr_chain_len == 0) {
+      //       index_table.erase(replaced_entry.addr);
+      //     }
+      //   }
+      // }
 
       // Allocate new entry
       ghb_entry_t entry;

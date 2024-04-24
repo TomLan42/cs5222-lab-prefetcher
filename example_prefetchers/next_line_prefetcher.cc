@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include "../inc/prefetcher.h"
 
+int issued_count;
+
 void l2_prefetcher_initialize(int cpu_num)
 {
   printf("Next-Line Prefetcher\n");
@@ -29,6 +31,7 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
   // since addr is a byte address, we >>6 to get the cache line address, +1, and then <<6 it back to a byte address
   // l2_prefetch_line is expecting byte addresses
   l2_prefetch_line(0, addr, ((addr>>6)+1)<<6, FILL_L2);
+  issued_count++;	      
 }
 
 void l2_cache_fill(int cpu_num, unsigned long long int addr, int set, int way, int prefetch, unsigned long long int evicted_addr)
@@ -50,4 +53,5 @@ void l2_prefetcher_warmup_stats(int cpu_num)
 void l2_prefetcher_final_stats(int cpu_num)
 {
   printf("Prefetcher final stats\n");
+  printf("prefetch count: %d\n", issued_count);
 }
