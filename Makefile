@@ -1,5 +1,5 @@
 
-all: dpc2sim-stream dpc2sim-ip-stride dpc2sim-next-line dpc2sim-ampm-lite dpc2sim-ghb-g-ac dpc2sim-skeleton
+all: dpc2sim-stream dpc2sim-ip-stride dpc2sim-next-line dpc2sim-ampm-lite dpc2sim-ghb-g-ac dpc2sim-skeleton dpc2sim-markov dpc2sim-markov-one-degree dpc2sim-markov-delta
 
 run: dpc2sim-ghb-g-ac
 	zcat traces/mcf_trace2.dpc.gz | ./dpc2sim-ghb-ac
@@ -29,7 +29,10 @@ dpc2sim-markov-one-degree:
 	$(CXX) -Wall -no-pie -o dpc2sim-markov-one-degree example_prefetchers/one_degree_markov.cc lib/dpc2sim.a
 
 dpc2sim-markov:
-	$(CXX) -Wall -no-pie -o dpc2sim-markov example_prefetchers/markov.cc lib/dpc2sim.a
+	$(CXX) -Wall -g -no-pie -o dpc2sim-markov example_prefetchers/markov.cc lib/dpc2sim.a
+
+dpc2sim-markov-delta:
+	$(CXX) -Wall -g -no-pie -o dpc2sim-markov-delta example_prefetchers/markov_delta.cc example_prefetchers/delta.cc lib/dpc2sim.a
 
 clean:
 	rm -rf test_ghb_ac
@@ -38,6 +41,7 @@ clean:
 	rm -rf dpc2sim-ghb-dc
 	rm -rf dpc2sim-markov
 	rm -rf dpc2sim-markov-one-degree
+	rm -rf dpc2sim-markov-delta
 
 test_ghb_ac:
 	$(CXX) -Wall -o test_ghb_ac example_prefetchers/test_ghb_ac.cc example_prefetchers/ghb.cc

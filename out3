@@ -1,0 +1,214 @@
+
+*** Data Prefetching Championship 2 Simulator ***
+
+Warmup Instructions: 10000000
+Simulation Instructions: 100000000
+Scramble loads OFF
+Using 1MB Last Level Cache
+Using 12.8 GB/s DRAM bandwidth
+Knobs visible from prefetcher: 0 0 0
+Instructions Retired: 100000 Cycle: 76858 Hearbeat IPC: 1.301101 Cumulative IPC: 1.301101
+Prefetcher heartbeat stats
+Instructions Retired: 200000 Cycle: 156228 Hearbeat IPC: 1.259922 Cumulative IPC: 1.280180
+Prefetcher heartbeat stats
+Instructions Retired: 300000 Cycle: 233085 Hearbeat IPC: 1.301118 Cumulative IPC: 1.287084
+Prefetcher heartbeat stats
+Instructions Retired: 400000 Cycle: 313287 Hearbeat IPC: 1.246852 Cumulative IPC: 1.276785
+Prefetcher heartbeat stats
+Instructions Retired: 500000 Cycle: 389036 Hearbeat IPC: 1.320149 Cumulative IPC: 1.285228
+Prefetcher heartbeat stats
+Instructions Retired: 600000 Cycle: 469378 Hearbeat IPC: 1.244679 Cumulative IPC: 1.278287
+Prefetcher heartbeat stats
+Instructions Retired: 700000 Cycle: 546183 Hearbeat IPC: 1.301999 Cumulative IPC: 1.281622
+Prefetcher heartbeat stats
+Instructions Retired: 800000 Cycle: 624772 Hearbeat IPC: 1.272443 Cumulative IPC: 1.280467
+Prefetcher heartbeat stats
+Instructions Retired: 900000 Cycle: 718865 Hearbeat IPC: 1.062778 Cumulative IPC: 1.251974
+Prefetcher heartbeat stats
+Instructions Retired: 1000000 Cycle: 834005 Hearbeat IPC: 0.868508 Cumulative IPC: 1.199034
+Prefetcher heartbeat stats
+Instructions Retired: 1100000 Cycle: 937811 Hearbeat IPC: 0.963335 Cumulative IPC: 1.172944
+Prefetcher heartbeat stats
+Instructions Retired: 1200000 Cycle: 1041905 Hearbeat IPC: 0.960670 Cumulative IPC: 1.151736
+Prefetcher heartbeat stats
+Instructions Retired: 1300000 Cycle: 1157320 Hearbeat IPC: 0.866439 Cumulative IPC: 1.123285
+Prefetcher heartbeat stats
+Instructions Retired: 1400000 Cycle: 1268958 Hearbeat IPC: 0.895752 Cumulative IPC: 1.103267
+Prefetcher heartbeat stats
+Instructions Retired: 1500003 Cycle: 1373341 Hearbeat IPC: 0.958039 Cumulative IPC: 1.092229
+Prefetcher heartbeat stats
+Instructions Retired: 1600000 Cycle: 1487705 Hearbeat IPC: 0.874375 Cumulative IPC: 1.075482
+Prefetcher heartbeat stats
+Instructions Retired: 1700000 Cycle: 1566548 Hearbeat IPC: 1.268343 Cumulative IPC: 1.085189
+Prefetcher heartbeat stats
+Instructions Retired: 1800000 Cycle: 1666972 Hearbeat IPC: 0.995778 Cumulative IPC: 1.079802
+Prefetcher heartbeat stats
+Instructions Retired: 1900000 Cycle: 1779036 Hearbeat IPC: 0.892347 Cumulative IPC: 1.067994
+Prefetcher heartbeat stats
+Instructions Retired: 2000000 Cycle: 1866691 Hearbeat IPC: 1.140836 Cumulative IPC: 1.071415
+Prefetcher heartbeat stats
+Instructions Retired: 2100000 Cycle: 1978576 Hearbeat IPC: 0.893775 Cumulative IPC: 1.061369
+Prefetcher heartbeat stats
+Instructions Retired: 2200000 Cycle: 2080785 Hearbeat IPC: 0.978387 Cumulative IPC: 1.057293
+Prefetcher heartbeat stats
+Instructions Retired: 2300000 Cycle: 2177585 Hearbeat IPC: 1.033058 Cumulative IPC: 1.056216
+Prefetcher heartbeat stats
+Instructions Retired: 2400000 Cycle: 2293978 Hearbeat IPC: 0.859158 Cumulative IPC: 1.046218
+Prefetcher heartbeat stats
+Instructions Retired: 2500000 Cycle: 2397431 Hearbeat IPC: 0.966623 Cumulative IPC: 1.042783
+Prefetcher heartbeat stats
+Instructions Retired: 2600000 Cycle: 2500068 Hearbeat IPC: 0.974308 Cumulative IPC: 1.039972
+Prefetcher heartbeat stats
+Instructions Retired: 2700000 Cycle: 2611738 Hearbeat IPC: 0.895496 Cumulative IPC: 1.033794
+Prefetcher heartbeat stats
+Instructions Retired: 2800000 Cycle: 2722315 Hearbeat IPC: 0.904347 Cumulative IPC: 1.028536
+Prefetcher heartbeat stats
+Instructions Retired: 2900000 Cycle: 2828471 Hearbeat IPC: 0.942010 Cumulative IPC: 1.025289
+Prefetcher heartbeat stats
+Instructions Retired: 3000004 Cycle: 2939466 Hearbeat IPC: 0.900977 Cumulative IPC: 1.020595
+Prefetcher heartbeat stats
+
+Simulation complete. Instructions retired: 3099756 Cycles elapsed: 3051301 IPC: 1.015880
+
+Prefetcher final stats
+1st Degree pattern Distribution:
+No. of occurance: 1, No. of patterns: 4757
+No. of occurance: 2, No. of patterns: 1746
+No. of occurance: 3, No. of patterns: 1184
+No. of occurance: 4, No. of patterns: 984
+No. of occurance: 5, No. of patterns: 753
+No. of occurance: 6, No. of patterns: 951
+No. of occurance: 7, No. of patterns: 1336
+No. of occurance: 8, No. of patterns: 424
+No. of occurance: 9, No. of patterns: 263
+No. of occurance: 10, No. of patterns: 162
+No. of occurance: 11, No. of patterns: 155
+No. of occurance: 12, No. of patterns: 187
+No. of occurance: 13, No. of patterns: 167
+No. of occurance: 14, No. of patterns: 247
+No. of occurance: 15, No. of patterns: 32
+No. of occurance: 16, No. of patterns: 40
+No. of occurance: 17, No. of patterns: 52
+No. of occurance: 18, No. of patterns: 44
+No. of occurance: 19, No. of patterns: 27
+No. of occurance: 20, No. of patterns: 38
+No. of occurance: 21, No. of patterns: 20
+No. of occurance: 22, No. of patterns: 2
+No. of occurance: 26, No. of patterns: 1
+No. of occurance: 27, No. of patterns: 1
+No. of occurance: 65, No. of patterns: 1
+No. of occurance: 127, No. of patterns: 1
+No. of occurance: 689, No. of patterns: 1
+------------------------
+1st Degree pattern hit Distribution:
+No. of hits: 1, No. of patterns: 777
+No. of hits: 2, No. of patterns: 277
+No. of hits: 3, No. of patterns: 476
+No. of hits: 4, No. of patterns: 256
+No. of hits: 5, No. of patterns: 179
+No. of hits: 6, No. of patterns: 488
+No. of hits: 7, No. of patterns: 201
+No. of hits: 8, No. of patterns: 1608
+No. of hits: 9, No. of patterns: 169
+No. of hits: 10, No. of patterns: 305
+No. of hits: 11, No. of patterns: 105
+No. of hits: 12, No. of patterns: 100
+No. of hits: 13, No. of patterns: 86
+No. of hits: 14, No. of patterns: 92
+No. of hits: 15, No. of patterns: 366
+No. of hits: 16, No. of patterns: 626
+No. of hits: 17, No. of patterns: 121
+No. of hits: 18, No. of patterns: 86
+No. of hits: 19, No. of patterns: 47
+No. of hits: 20, No. of patterns: 68
+No. of hits: 21, No. of patterns: 285
+No. of hits: 22, No. of patterns: 75
+No. of hits: 23, No. of patterns: 84
+No. of hits: 24, No. of patterns: 320
+No. of hits: 25, No. of patterns: 136
+No. of hits: 26, No. of patterns: 59
+No. of hits: 27, No. of patterns: 67
+No. of hits: 28, No. of patterns: 79
+No. of hits: 29, No. of patterns: 63
+No. of hits: 30, No. of patterns: 55
+No. of hits: 31, No. of patterns: 64
+No. of hits: 32, No. of patterns: 245
+No. of hits: 33, No. of patterns: 74
+No. of hits: 34, No. of patterns: 49
+No. of hits: 35, No. of patterns: 57
+No. of hits: 36, No. of patterns: 171
+No. of hits: 37, No. of patterns: 34
+No. of hits: 38, No. of patterns: 66
+No. of hits: 39, No. of patterns: 74
+No. of hits: 40, No. of patterns: 127
+No. of hits: 41, No. of patterns: 115
+No. of hits: 42, No. of patterns: 49
+No. of hits: 43, No. of patterns: 29
+No. of hits: 44, No. of patterns: 106
+No. of hits: 45, No. of patterns: 41
+No. of hits: 46, No. of patterns: 34
+No. of hits: 47, No. of patterns: 27
+No. of hits: 48, No. of patterns: 115
+No. of hits: 49, No. of patterns: 84
+No. of hits: 50, No. of patterns: 24
+No. of hits: 51, No. of patterns: 18
+No. of hits: 52, No. of patterns: 80
+No. of hits: 53, No. of patterns: 25
+No. of hits: 54, No. of patterns: 27
+No. of hits: 55, No. of patterns: 116
+No. of hits: 56, No. of patterns: 106
+No. of hits: 57, No. of patterns: 37
+No. of hits: 58, No. of patterns: 26
+No. of hits: 59, No. of patterns: 27
+No. of hits: 60, No. of patterns: 73
+No. of hits: 61, No. of patterns: 8
+No. of hits: 62, No. of patterns: 6
+No. of hits: 63, No. of patterns: 17
+No. of hits: 64, No. of patterns: 29
+No. of hits: 65, No. of patterns: 6
+No. of hits: 66, No. of patterns: 7
+No. of hits: 67, No. of patterns: 13
+No. of hits: 68, No. of patterns: 31
+No. of hits: 69, No. of patterns: 15
+No. of hits: 70, No. of patterns: 6
+No. of hits: 71, No. of patterns: 16
+No. of hits: 72, No. of patterns: 27
+No. of hits: 73, No. of patterns: 4
+No. of hits: 74, No. of patterns: 4
+No. of hits: 75, No. of patterns: 4
+No. of hits: 76, No. of patterns: 55
+No. of hits: 77, No. of patterns: 17
+No. of hits: 78, No. of patterns: 8
+No. of hits: 79, No. of patterns: 4
+No. of hits: 80, No. of patterns: 46
+No. of hits: 82, No. of patterns: 14
+No. of hits: 83, No. of patterns: 2
+No. of hits: 84, No. of patterns: 9
+No. of hits: 85, No. of patterns: 7
+No. of hits: 86, No. of patterns: 5
+No. of hits: 88, No. of patterns: 21
+No. of hits: 89, No. of patterns: 2
+No. of hits: 90, No. of patterns: 3
+No. of hits: 91, No. of patterns: 6
+No. of hits: 92, No. of patterns: 16
+No. of hits: 94, No. of patterns: 6
+No. of hits: 96, No. of patterns: 42
+No. of hits: 97, No. of patterns: 1
+No. of hits: 100, No. of patterns: 28
+No. of hits: 104, No. of patterns: 14
+No. of hits: 107, No. of patterns: 2
+No. of hits: 108, No. of patterns: 16
+No. of hits: 112, No. of patterns: 14
+No. of hits: 120, No. of patterns: 19
+No. of hits: 128, No. of patterns: 26
+No. of hits: 132, No. of patterns: 1
+No. of hits: 136, No. of patterns: 20
+No. of hits: 144, No. of patterns: 26
+No. of hits: 145, No. of patterns: 1
+No. of hits: 152, No. of patterns: 19
+No. of hits: 160, No. of patterns: 7
+No. of hits: 168, No. of patterns: 5
+No. of hits: 261, No. of patterns: 1
+No. of hits: 495, No. of patterns: 1
+No. of hits: 3380, No. of patterns: 1
+------------------------

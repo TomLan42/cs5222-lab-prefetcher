@@ -61,13 +61,13 @@ void l2_prefetcher_final_stats(int cpu_num)
   // ghb.print_index_table();
   // ghb.print_index_table_stats();
 
-  printf("Prefetcher final stats\n");
-  printf("Hit count: %d \n", hit_count);
+  // printf("Prefetcher final stats\n");
+  // printf("Hit count: %d \n", hit_count);
 
 
-  // Print the contents of the map
-  for (const auto& pair : markov_table) {
-    std::cout << "Key: " << pair.first << ", Value: " << pair.second << std::endl;
-  }
+  // // Print the contents of the map
+  // for (const auto& pair : markov_table) {
+  //   std::cout << "Key: " << pair.first << ", Value: " << pair.second << std::endl;
+  // }
 
 }

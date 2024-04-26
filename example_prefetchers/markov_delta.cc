@@ -3,19 +3,21 @@
 #include "ghb.cc"
 #include <set>
 #include <climits>
+#include "delta.h"
 
-#define ROW_WIDTH 8
+#define ROW_WIDTH 4
 #define MAX_ROW_NUM 1024
 
 typedef struct markov_row {
     int head;
-    std::vector<unsigned long long int> data;
+    std::vector<signed long long int> data;
     unsigned long long lru_cycle;
 } markov_row_t;
 
-std::unordered_map<unsigned long long int, markov_row_t> markov_table;
+std::unordered_map<signed long long int, markov_row_t> markov_table;
 
 unsigned long long int prev_addr;
+signed long long int prev_delta;
 
 std::unordered_map<std::string, int> one_degree_pattern_count;
 std::unordered_map<std::string, int> one_degree_hit_count;
@@ -35,24 +37,28 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
     return;
   }
 
+
+  signed long long new_delta = get_delta(prev_addr, addr);
+
   // debug
-  std::string str1 = std::to_string(prev_addr);
-  std::string str2 = std::to_string(addr);
+  std::string str1 = std::to_string(prev_delta);
+  std::string str2 = std::to_string(new_delta);
   std::string concatenated = str1 + ", " + str2;
   one_degree_pattern_count[concatenated]++;
 
-  auto it = markov_table.find(addr);
+  auto it = markov_table.find(new_delta);
   if (it != markov_table.end())
   {
     // fetch the most recent records
     for(size_t i = 0; i < it->second.data.size(); i++){
       if (it->second.data[i] != 0)
       {
-        unsigned long long prefetch_addr = it->second.data[i];
-        l2_prefetch_line(0, addr, prefetch_addr, FILL_L2);
+        signed long long prefetch_delta = it->second.data[i];
 
-        std::string str1 = std::to_string(addr);
-        std::string str2 = std::to_string(prefetch_addr);
+        l2_prefetch_line(0, addr, apply_delta(addr, it->second.data[i]), FILL_L2);
+
+        std::string str1 = std::to_string(new_delta);
+        std::string str2 = std::to_string(prefetch_delta);
         std::string concatenated = str1 + ", " + str2;
         auto it = one_degree_pattern_count.find(concatenated);
         if (it != one_degree_pattern_count.end())
@@ -64,17 +70,17 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
     it->second.lru_cycle = get_current_cycle(0);
   }
 
-  auto it2 = markov_table.find(prev_addr);
+  auto it2 = markov_table.find(prev_delta);
   if (it2 == markov_table.end())
   {
     markov_row_t new_row;
     new_row.head = 0;
     new_row.data.resize(ROW_WIDTH);
-    markov_table[prev_addr] = new_row;
+    markov_table[prev_delta] = new_row;
   }
 
-  markov_table[prev_addr].data[markov_table[prev_addr].head] = addr;
-  markov_table[prev_addr].head = (markov_table[prev_addr].head + 1) % ROW_WIDTH;
+  markov_table[prev_delta].data[markov_table[prev_delta].head] = new_delta;
+  markov_table[prev_delta].head = (markov_table[prev_delta].head + 1) % ROW_WIDTH;
 
   // clear lru row
   if (markov_table.size() > MAX_ROW_NUM)
@@ -92,6 +98,7 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
   }
 
   prev_addr = addr;
+  prev_delta = new_delta;
 
   return;
 }
@@ -115,8 +122,16 @@ void l2_prefetcher_warmup_stats(int cpu_num)
 void l2_prefetcher_final_stats(int cpu_num)
 {
 
-
   printf("Prefetcher final stats\n");
+
+  // Print the contents of the markov_table
+  for (const auto& pair : markov_table) {
+      std::cout << "Key: " << pair.first << ", Head: " << pair.second.head << ", Data: ";
+      for (const auto& data : pair.second.data) {
+          std::cout << data << " ";
+      }
+      std::cout << std::endl;
+  }
 
   std::map<signed long long, unsigned long long> pattern_dist;
   for (const auto& pair : one_degree_pattern_count) {

@@ -10,9 +10,9 @@
 GHB ghb(GHB_LENGTH, TYPE_G_AC);
 
 
-std::unordered_map<std::string, int> one_degree_pattern_count;
 unsigned long long prev_addr;
 
+std::unordered_map<std::string, int> one_degree_pattern_count;
 std::unordered_map<std::string, int> one_degree_hit_count;
 
 std::unordered_map<int, int> pf_success_count;
@@ -113,17 +113,17 @@ void l2_prefetcher_final_stats(int cpu_num)
   std::cout << "------------------------" << std::endl;
 
 
-  std::cout << "Prefetch success rate" << std::endl;
-  for (const auto& pair : pf_success_count) 
-  {
-    std::cout << "Key: " << pair.first << ", Value: " << pair.second << std::endl;
+  std::map<signed long long, unsigned long long> pattern_hit_dist;
+  for (const auto& pair : one_degree_hit_count) {
+    pattern_hit_dist[pair.second]++;
   }
 
-  std::cout << "Prefetch hit rate" << std::endl;
-  for (const auto& pair : one_degree_hit_count) 
+  std::cout << "1st Degree pattern hit Distribution:" << std::endl;
+  for (const auto& pair : pattern_hit_dist) 
   {
-    std::cout << "Key: " << pair.first << ", Value: " << pair.second << std::endl;
+    std::cout << "No. of hits: " << pair.first << ", No. of patterns: " << pair.second << std::endl;
   }
+  std::cout << "------------------------" << std::endl;
 
   printf("Prefetcher final stats\n");
 }
