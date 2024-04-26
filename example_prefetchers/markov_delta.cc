@@ -124,38 +124,29 @@ void l2_prefetcher_final_stats(int cpu_num)
 
   printf("Prefetcher final stats\n");
 
-  // // Print the contents of the markov_table
-  // for (const auto& pair : markov_table) {
-  //     std::cout << "Key: " << pair.first << ", Head: " << pair.second.head << ", Data: ";
-  //     for (const auto& data : pair.second.data) {
-  //         std::cout << data << " ";
-  //     }
-  //     std::cout << std::endl;
-  // }
+  std::map<signed long long, unsigned long long> pattern_dist;
+  for (const auto& pair : one_degree_pattern_count) {
+    pattern_dist[pair.second]++;
+  }
 
-  // std::map<signed long long, unsigned long long> pattern_dist;
-  // for (const auto& pair : one_degree_pattern_count) {
-  //   pattern_dist[pair.second]++;
-  // }
-
-  // std::cout << "1st Degree pattern Distribution:" << std::endl;
-  // for (const auto& pair : pattern_dist) 
-  // {
-  //   std::cout << "No. of occurance: " << pair.first << ", No. of patterns: " << pair.second << std::endl;
-  // }
-  // std::cout << "------------------------" << std::endl;
+  std::cout << "1st Degree pattern Distribution:" << std::endl;
+  for (const auto& pair : pattern_dist) 
+  {
+    std::cout << "No. of occurance: " << pair.first << ", No. of patterns: " << pair.second << std::endl;
+  }
+  std::cout << "------------------------" << std::endl;
 
 
-  // std::map<signed long long, unsigned long long> pattern_hit_dist;
-  // for (const auto& pair : one_degree_hit_count) {
-  //   pattern_hit_dist[pair.second]++;
-  // }
+  std::map<signed long long, unsigned long long> pattern_hit_dist;
+  for (const auto& pair : one_degree_hit_count) {
+    pattern_hit_dist[pair.second]++;
+  }
 
-  // std::cout << "1st Degree pattern hit Distribution:" << std::endl;
-  // for (const auto& pair : pattern_hit_dist) 
-  // {
-  //   std::cout << "No. of hits: " << pair.first << ", No. of patterns: " << pair.second << std::endl;
-  // }
-  // std::cout << "------------------------" << std::endl;
+  std::cout << "1st Degree pattern hit Distribution:" << std::endl;
+  for (const auto& pair : pattern_hit_dist) 
+  {
+    std::cout << "No. of hits: " << pair.first << ", No. of patterns: " << pair.second << std::endl;
+  }
+  std::cout << "------------------------" << std::endl;
 
 }

@@ -88,17 +88,15 @@ void l2_prefetcher_final_stats(int cpu_num)
   // ghb.print_index_table();
   // ghb.print_index_table_stats();
 
+  printf("Prefetcher final stats\n");
 
-  std::map<signed long long, unsigned long long> index_table_dist;
-
-
-  // Iterating over the unordered map
+  std::map<signed long long, unsigned long long> pattern_dist;
   for (const auto& pair : one_degree_pattern_count) {
-    index_table_dist[pair.second]++;
+    pattern_dist[pair.second]++;
   }
 
   std::cout << "1st Degree pattern Distribution:" << std::endl;
-  for (const auto& pair : index_table_dist) 
+  for (const auto& pair : pattern_dist) 
   {
     std::cout << "No. of occurance: " << pair.first << ", No. of patterns: " << pair.second << std::endl;
   }
@@ -117,5 +115,5 @@ void l2_prefetcher_final_stats(int cpu_num)
   }
   std::cout << "------------------------" << std::endl;
 
-  printf("Prefetcher final stats\n");
+
 }

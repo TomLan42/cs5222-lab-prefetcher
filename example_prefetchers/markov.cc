@@ -115,7 +115,6 @@ void l2_prefetcher_warmup_stats(int cpu_num)
 void l2_prefetcher_final_stats(int cpu_num)
 {
 
-
   printf("Prefetcher final stats\n");
 
   std::map<signed long long, unsigned long long> pattern_dist;

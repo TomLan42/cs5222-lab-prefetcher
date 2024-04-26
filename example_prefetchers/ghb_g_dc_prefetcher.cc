@@ -3,7 +3,7 @@
 #include "ghb.cc"
 #include <set>
 
-#define GHB_LENGTH 2048
+#define GHB_LENGTH 100000
 #define PREFETCH_WIDTH 4
 #define PREFETCH_DEPTH 4
 
@@ -68,10 +68,5 @@ void l2_prefetcher_warmup_stats(int cpu_num)
 
 void l2_prefetcher_final_stats(int cpu_num)
 {
-  // ghb.print_index_table();
-
-
-  // ghb.print_index_table_stats();
-  
   printf("Prefetcher final stats\n");
 }
