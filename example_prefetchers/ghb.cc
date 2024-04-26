@@ -28,10 +28,15 @@ private:
     int head;     // head points to the next write position
     int size;
 
+
+    std::unordered_map<unsigned long long int, unsigned long long int> addr_stats_table;
+    std::unordered_map<long long int, unsigned long long int> delta_stats_table;
+
 public:
     // Constructor
-    GHB(int capacity, int type) : capacity(capacity), head(0), size(0), xy_type(type) {
+    GHB(int capacity, int type) : capacity(capacity), head(0), size(0) {
         buffer.resize(capacity);
+        xy_type = type;
     }
 
     // Destructor
@@ -53,17 +58,18 @@ public:
 
     void add_entry_ac(unsigned long long int addr) 
     {
-      int delta = addr - buffer[(head-1)%capacity].addr;
+
+      addr_stats_table[addr]++;
+
 
       // Remove overwritten entry
       ghb_entry_t replaced_entry =  buffer[head];
       if (replaced_entry.addr != 0) {
-        int replaced_delta = buffer[(head+1)%capacity].addr - replaced_entry.addr;
-        auto it = delta_index_table.find(replaced_delta);
-        if (it != delta_index_table.end()) {
+        auto it = addr_index_table.find(replaced_entry.addr);
+        if (it != addr_index_table.end()) {
           it->second.addr_chain_len--;
           if (it->second.addr_chain_len == 0) {
-            delta_index_table.erase(replaced_delta);
+            addr_index_table.erase(replaced_entry.addr);
           }
         }
       }
@@ -72,8 +78,8 @@ public:
       ghb_entry_t entry;
       entry.addr = addr;
 
-      auto it = delta_index_table.find(delta);
-      if (it != delta_index_table.end()) {
+      auto it = addr_index_table.find(addr);
+      if (it != addr_index_table.end()) {
         entry.last_addr_ptr = it->second.addr_head_index;
 
         it->second.addr_chain_len++;
@@ -84,7 +90,7 @@ public:
         index_table_entry_t index_table_entry;
         index_table_entry.addr_chain_len = 1;
         index_table_entry.addr_head_index = head;
-        addr_index_table[delta] = index_table_entry;
+        addr_index_table[addr] = index_table_entry;
       }
 
       buffer[head] = entry;
@@ -99,14 +105,15 @@ public:
     }
 
     void add_entry_dc(unsigned long long int addr) {
-       // Remove overwritten entry
+      // Remove overwritten entry
       ghb_entry_t replaced_entry =  buffer[head];
       if (replaced_entry.addr != 0) {
-        auto it = delta_index_table.find(replaced_entry.addr);
+        signed long long replaced_delta = get_delta(replaced_entry.addr, buffer[(head+1) % capacity].addr);
+        auto it = delta_index_table.find(replaced_delta);
         if (it != delta_index_table.end()) {
           it->second.addr_chain_len--;
           if (it->second.addr_chain_len == 0) {
-            addr_index_table.erase(replaced_entry.addr);
+            addr_index_table.erase(replaced_delta);
           }
         }
       }
@@ -115,8 +122,13 @@ public:
       ghb_entry_t entry;
       entry.addr = addr;
 
-      auto it = addr_index_table.find(entry.addr);
-      if (it != addr_index_table.end()) {
+
+      signed long long new_delta = get_delta(buffer[(head-1) % capacity].addr, addr);
+
+      delta_stats_table[new_delta]++;
+
+      auto it = delta_index_table.find(new_delta);
+      if (it != delta_index_table.end()) {
         entry.last_addr_ptr = it->second.addr_head_index;
 
         it->second.addr_chain_len++;
@@ -127,7 +139,10 @@ public:
         index_table_entry_t index_table_entry;
         index_table_entry.addr_chain_len = 1;
         index_table_entry.addr_head_index = head;
-        addr_index_table[entry.addr] = index_table_entry;
+        if (buffer[(head-1) % capacity].addr != 0)
+        {
+          delta_index_table[new_delta] = index_table_entry;
+        }
       }
 
       buffer[head] = entry;
@@ -157,7 +172,7 @@ public:
       
       if (xy_type == TYPE_G_DC)
       {
-        int delta = addr - buffer[head].addr;
+        signed long long delta = get_delta(addr, buffer[(head-1)%capacity].addr);
         auto it = delta_index_table.find(delta);
         if (it == delta_index_table.end()) 
         {
@@ -186,7 +201,7 @@ public:
     {
       std::cout << "Buffer contents:" << std::endl;
       for (const auto& entry : buffer) {
-        std::cout << "Address: " << entry.addr << ", Last pointer: " << entry.last_addr_ptr << std::endl;
+        std::cout << "Address: 0x" << std::hex <<  entry.addr << ", Prev pointer: " << std::dec << entry.last_addr_ptr <<  ", Prev val:0x" <<  std::hex << buffer[entry.last_addr_ptr].addr << std::endl;
       }
       std::cout << "head: " << head << std::endl;
       std::cout << "size: " << size << std::endl;
@@ -199,7 +214,7 @@ public:
         std::cout << "Address Index table contents:" << std::endl;
         for (const auto& pair : addr_index_table) 
         {
-          std::cout << "Addr: " << pair.first << ", Head: " << pair.second.addr_head_index <<  ", Chain len: " << pair.second.addr_chain_len <<  std::endl;
+          std::cout << "Addr: " << std::hex << pair.first << ", Head: " << std::dec << pair.second.addr_head_index <<   ", Chain len: " << std::dec << pair.second.addr_chain_len <<  std::endl;
         }
         std::cout << "----------"  << std::endl;
       }
@@ -209,7 +224,7 @@ public:
         std::cout << "Delta Index table contents:" << std::endl;
         for (const auto& pair : delta_index_table) 
         {
-          std::cout << "Addr: " << pair.first << ", Head: " << pair.second.addr_head_index <<  ", Chain len: " << pair.second.addr_chain_len <<  std::endl;
+          std::cout << "Delta: " << std::dec << pair.first << ", Head: " << std::dec << pair.second.addr_head_index <<   ", Chain len: " << std::dec << pair.second.addr_chain_len <<  std::endl;
         }
         std::cout << "----------"  << std::endl;
       }
@@ -218,32 +233,56 @@ public:
 
 
     void print_index_table_stats() {
-      std::map<int, int> index_table_dist;
+      std::map<signed long long, unsigned long long> index_table_dist;
 
       if (xy_type == TYPE_G_AC)
       {
-        for (const auto& pair : addr_index_table) 
+        for (const auto& pair : addr_stats_table) 
         {
-          index_table_dist[pair.second.addr_chain_len]++;
+          index_table_dist[pair.second]++;
+        }
+        std::cout << "Miss Addr Distribution:" << std::endl;
+        for (const auto& pair : index_table_dist) 
+        {
+          std::cout << "No. of occurance: " << pair.first << ", No. of addr: " << pair.second << std::endl;
         }
       }
       if (xy_type == TYPE_G_DC)
       {
-        for (const auto& pair : delta_index_table) 
+        for (const auto& pair : delta_stats_table) 
         {
-          index_table_dist[pair.second.addr_chain_len]++;
+          index_table_dist[pair.second]++;
+        }
+        std::cout << "Delta Distribution:" << std::endl;
+        for (const auto& pair : index_table_dist) 
+        {
+          std::cout << "No. of occurance: " << pair.first << ", No. of deltas: " << pair.second << std::endl;
         }
       }
 
-      std::cout << "Index Table Dist contents:" << std::endl;
-      for (const auto& pair : index_table_dist) {
-        std::cout << "Key: " << pair.first << ", Value: " << pair.second << std::endl;
-      }
     }
 
 
     bool is_full() {
         return (size == capacity);
     }
+
+    signed long long get_delta(unsigned long long addr,  unsigned long long next_addr)
+    {
+      signed long long delta = static_cast<signed long long>(next_addr) - static_cast<signed long long>(addr);
+      return delta;
+    }
+
+    unsigned long long apply_delta(unsigned long long addr,  signed long long delta)
+    {
+      if (delta < 0) {
+        delta = -delta;
+        return addr - static_cast<unsigned long long>(delta);
+      }
+    
+      return addr + static_cast<unsigned long long>(delta);
+    }
 };
+
+
 

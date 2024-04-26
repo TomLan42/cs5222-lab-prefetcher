@@ -2,7 +2,7 @@
 all: dpc2sim-stream dpc2sim-ip-stride dpc2sim-next-line dpc2sim-ampm-lite dpc2sim-ghb-g-ac dpc2sim-skeleton
 
 run: dpc2sim-ghb-g-ac
-	zcat traces/mcf_trace2.dpc.gz | ./dpc2sim-ghb
+	zcat traces/mcf_trace2.dpc.gz | ./dpc2sim-ghb-ac
 
 debug: dpc2sim-ghb-g-ac
 	zcat traces/mcf_trace2.dpc.gz | ./dpc2sim-ghb -warmup_instructions 0 -simulation_instructions 4000
@@ -23,13 +23,25 @@ dpc2sim-skeleton:
 	$(CXX) -Wall -no-pie -o dpc2sim-skeleton example_prefetchers/skeleton.cc lib/dpc2sim.a
 
 dpc2sim-ghb-g-ac:
-	$(CXX) -Wall -no-pie -o dpc2sim-ghb example_prefetchers/ghb_g_ac_prefetcher.cc example_prefetchers/ghb.cc lib/dpc2sim.a
+	$(CXX) -Wall -no-pie -o dpc2sim-ghb-ac example_prefetchers/ghb_g_ac_prefetcher.cc example_prefetchers/ghb.cc lib/dpc2sim.a
+
+dpc2sim-ghb-g-dc:
+	$(CXX) -Wall -no-pie -o dpc2sim-ghb-dc example_prefetchers/ghb_g_dc_prefetcher.cc example_prefetchers/ghb.cc lib/dpc2sim.a
+
+
+dpc2sim-markov:
+	$(CXX) -Wall -no-pie -o dpc2sim-markov example_prefetchers/one_degree_markov.cc lib/dpc2sim.a
 
 clean:
-	rm -rf dpc2sim-ghb
+	rm -rf test_ghb_ac
+	rm -rf test_ghb_dc
 
-test:
-	$(CXX) -Wall -o test_ghb example_prefetchers/test_ghb.cc example_prefetchers/ghb.cc
-	./test_ghb
+test_ghb_ac:
+	$(CXX) -Wall -o test_ghb_ac example_prefetchers/test_ghb_ac.cc example_prefetchers/ghb.cc
+	./test_ghb_ac
+	
+test_ghb_dc:
+	$(CXX) -Wall -o test_ghb_dc example_prefetchers/test_ghb_dc.cc example_prefetchers/ghb.cc
+	./test_ghb_dc
 
 .PHONY: all run clean

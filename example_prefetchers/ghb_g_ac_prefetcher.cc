@@ -3,12 +3,19 @@
 #include "ghb.cc"
 #include <set>
 
-#define GHB_LENGTH 2048
-#define PREFETCH_WIDTH 8
-#define PREFETCH_DEPTH 64
+#define GHB_LENGTH 10000
+#define PREFETCH_WIDTH 4
+#define PREFETCH_DEPTH 4
 
 GHB ghb(GHB_LENGTH, TYPE_G_AC);
 
+
+std::unordered_map<std::string, int> one_degree_pattern_count;
+unsigned long long prev_addr;
+
+std::unordered_map<std::string, int> one_degree_hit_count;
+
+std::unordered_map<int, int> pf_success_count;
 
 void l2_prefetcher_initialize(int cpu_num)
 {
@@ -23,6 +30,13 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
 
  
   if (!cache_hit) {
+
+    // debug
+    std::string str1 = std::to_string(prev_addr);
+    std::string str2 = std::to_string(addr);
+    std::string concatenated = str1 + ", " + str2;
+    one_degree_pattern_count[concatenated]++;
+    prev_addr = addr;
 
     ghb.add_entry(addr);
 
@@ -44,7 +58,17 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
 
 
     for (int prefetch_addr : prefetch_addr_set) {
-      l2_prefetch_line(0, addr, prefetch_addr, FILL_L2);
+      std::string str1 = std::to_string(addr);
+      std::string str2 = std::to_string(prefetch_addr);
+      std::string concatenated = str1 + ", " + str2;
+      auto it = one_degree_pattern_count.find(concatenated);
+      if (it != one_degree_pattern_count.end())
+      {
+        one_degree_hit_count[concatenated]++;
+      }
+
+      int result = l2_prefetch_line(0, addr, prefetch_addr, FILL_L2);
+      pf_success_count[result]++;
     }
   }
 
@@ -70,9 +94,36 @@ void l2_prefetcher_warmup_stats(int cpu_num)
 void l2_prefetcher_final_stats(int cpu_num)
 {
   // ghb.print_index_table();
+  // ghb.print_index_table_stats();
 
 
-  ghb.print_index_table_stats();
-  
+  std::map<signed long long, unsigned long long> index_table_dist;
+
+
+  // Iterating over the unordered map
+  for (const auto& pair : one_degree_pattern_count) {
+    index_table_dist[pair.second]++;
+  }
+
+  std::cout << "1st Degree pattern Distribution:" << std::endl;
+  for (const auto& pair : index_table_dist) 
+  {
+    std::cout << "No. of occurance: " << pair.first << ", No. of patterns: " << pair.second << std::endl;
+  }
+  std::cout << "------------------------" << std::endl;
+
+
+  std::cout << "Prefetch success rate" << std::endl;
+  for (const auto& pair : pf_success_count) 
+  {
+    std::cout << "Key: " << pair.first << ", Value: " << pair.second << std::endl;
+  }
+
+  std::cout << "Prefetch hit rate" << std::endl;
+  for (const auto& pair : one_degree_hit_count) 
+  {
+    std::cout << "Key: " << pair.first << ", Value: " << pair.second << std::endl;
+  }
+
   printf("Prefetcher final stats\n");
 }

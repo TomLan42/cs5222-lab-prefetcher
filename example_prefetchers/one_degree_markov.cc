@@ -3,11 +3,20 @@
 #include "ghb.cc"
 #include <set>
 
-#define GHB_LENGTH 2048
-#define PREFETCH_WIDTH 8
-#define PREFETCH_DEPTH 64
+#define ROW_WIDTH 1
 
-GHB ghb(GHB_LENGTH, TYPE_G_DC);
+typedef struct markov_row {
+    int head;
+    std::vector<unsigned long long int> row;
+} markov_row_t;
+
+std::unordered_map<unsigned long long int, markov_row_t> markov_table;
+
+unsigned long long int prev_addr;
+
+std::unordered_map<std::string, int> one_degree_hit_count;
+
+std::unordered_map<int, int> pf_success_count;
 
 
 void l2_prefetcher_initialize(int cpu_num)
@@ -21,31 +30,24 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
   // uncomment this line to see all the information available to make prefetch decisions
   // printf("(0x%llx 0x%llx %d %d %d) \n", addr, ip, cache_hit, get_l2_read_queue_occupancy(0), get_l2_mshr_occupancy(0));
 
- 
   if (!cache_hit) {
-
-    ghb.add_entry(addr);
-
-    std::set<unsigned long long int> prefetch_addr_set;
-
-    // get width
-    std::vector<int> width_indices = ghb.get_chained_entries_by_addr(addr, PREFETCH_WIDTH);
-
-    // get depth
-    for (size_t i = 0; i < width_indices.size(); i++) {
-      int index = width_indices[i];
-      for (int j = 0; j < PREFETCH_DEPTH; j++) {
-        ghb_entry_t entry = ghb.get_entry_by_index((index + 1 + j) % GHB_LENGTH);
-        if (entry.addr != 0) {
-          signed long long delta = ghb.get_delta(entry.addr, ghb.get_entry_by_index(index).addr);
-          prefetch_addr_set.insert(ghb.apply_delta(addr, delta));
+    auto it = markov_table.find(prev_addr);
+    if (it != markov_table.end())
+    {
+      for (int next_addr : it->second.row) {
+        if (next_addr != 0)
+        {
+          l2_prefetch_line(0, addr, next_addr, FILL_L2);
         }
       }
+      it->second.row[it->second.head] = addr;
+      it->second.head = (it->second.head + 1) % ROW_WIDTH;
     }
-
-
-    for (int prefetch_addr : prefetch_addr_set) {
-      l2_prefetch_line(0, addr, prefetch_addr, FILL_L2);
+    else
+    {
+      markov_table[prev_addr].row.resize(ROW_WIDTH);
+      markov_table[prev_addr].row[0] = addr;
+      markov_table[prev_addr].head = 1 % ROW_WIDTH;
     }
   }
 
@@ -71,9 +73,7 @@ void l2_prefetcher_warmup_stats(int cpu_num)
 void l2_prefetcher_final_stats(int cpu_num)
 {
   // ghb.print_index_table();
+  // ghb.print_index_table_stats();
 
-
-  ghb.print_index_table_stats();
-  
   printf("Prefetcher final stats\n");
 }
