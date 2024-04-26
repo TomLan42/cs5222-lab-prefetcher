@@ -5,18 +5,11 @@
 
 #define ROW_WIDTH 1
 
-typedef struct markov_row {
-    int head;
-    std::vector<unsigned long long int> row;
-} markov_row_t;
-
-std::unordered_map<unsigned long long int, markov_row_t> markov_table;
+std::unordered_map<unsigned long long int, unsigned long long int> markov_table;
 
 unsigned long long int prev_addr;
 
-std::unordered_map<std::string, int> one_degree_hit_count;
-
-std::unordered_map<int, int> pf_success_count;
+int hit_count;
 
 
 void l2_prefetcher_initialize(int cpu_num)
@@ -30,27 +23,20 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
   // uncomment this line to see all the information available to make prefetch decisions
   // printf("(0x%llx 0x%llx %d %d %d) \n", addr, ip, cache_hit, get_l2_read_queue_occupancy(0), get_l2_mshr_occupancy(0));
 
-  if (!cache_hit) {
-    auto it = markov_table.find(prev_addr);
-    if (it != markov_table.end())
-    {
-      for (int next_addr : it->second.row) {
-        if (next_addr != 0)
-        {
-          l2_prefetch_line(0, addr, next_addr, FILL_L2);
-        }
-      }
-      it->second.row[it->second.head] = addr;
-      it->second.head = (it->second.head + 1) % ROW_WIDTH;
-    }
-    else
-    {
-      markov_table[prev_addr].row.resize(ROW_WIDTH);
-      markov_table[prev_addr].row[0] = addr;
-      markov_table[prev_addr].head = 1 % ROW_WIDTH;
-    }
+  if (cache_hit) {
+    return;
   }
 
+  auto it = markov_table.find(addr);
+  if (it != markov_table.end())
+  {
+    l2_prefetch_line(0, addr, it->second, FILL_L2);
+    hit_count++;
+  }
+  markov_table[prev_addr] = addr;
+  
+  prev_addr = addr;
+  
   return;
 }
 
@@ -76,4 +62,12 @@ void l2_prefetcher_final_stats(int cpu_num)
   // ghb.print_index_table_stats();
 
   printf("Prefetcher final stats\n");
+  printf("Hit count: %d \n", hit_count);
+
+
+  // Print the contents of the map
+  for (const auto& pair : markov_table) {
+    std::cout << "Key: " << pair.first << ", Value: " << pair.second << std::endl;
+  }
+
 }
