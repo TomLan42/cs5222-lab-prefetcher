@@ -1,2 +1,2 @@
-docker run -it --rm -v /Users/tomlan/Desktop/CS5222/project_3/cs5222-lab-prefetcher:/cs5222-lab-prefetcher ubuntu_cpp
+docker run -it --rm -v /Users/bytedance/go/src/github.com/cs5222-lab-prefetcher:/cs5222-lab-prefetcher ubuntu_cpp
 

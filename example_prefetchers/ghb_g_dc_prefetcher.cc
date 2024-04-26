@@ -4,8 +4,8 @@
 #include <set>
 
 #define GHB_LENGTH 2048
-#define PREFETCH_WIDTH 8
-#define PREFETCH_DEPTH 64
+#define PREFETCH_WIDTH 4
+#define PREFETCH_DEPTH 4
 
 GHB ghb(GHB_LENGTH, TYPE_G_DC);
 
@@ -32,20 +32,18 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
     std::vector<int> width_indices = ghb.get_chained_entries_by_addr(addr, PREFETCH_WIDTH);
 
     // get depth
-    for (size_t i = 0; i < width_indices.size(); i++) {
+    for (size_t i = 0; i < width_indices.size(); i++) 
+    {
       int index = width_indices[i];
-      for (int j = 0; j < PREFETCH_DEPTH; j++) {
+      for (int j = 0; j < PREFETCH_DEPTH; j++) 
+      {
         ghb_entry_t entry = ghb.get_entry_by_index((index + 1 + j) % GHB_LENGTH);
-        if (entry.addr != 0) {
+        if (entry.addr != 0) 
+        {
           signed long long delta = ghb.get_delta(entry.addr, ghb.get_entry_by_index(index).addr);
-          prefetch_addr_set.insert(ghb.apply_delta(addr, delta));
+          l2_prefetch_line(0, addr, ghb.apply_delta(addr, delta), FILL_L2);
         }
       }
-    }
-
-
-    for (int prefetch_addr : prefetch_addr_set) {
-      l2_prefetch_line(0, addr, prefetch_addr, FILL_L2);
     }
   }
 
@@ -73,7 +71,7 @@ void l2_prefetcher_final_stats(int cpu_num)
   // ghb.print_index_table();
 
 
-  ghb.print_index_table_stats();
+  // ghb.print_index_table_stats();
   
   printf("Prefetcher final stats\n");
 }

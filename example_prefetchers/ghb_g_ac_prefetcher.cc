@@ -40,8 +40,6 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
 
     ghb.add_entry(addr);
 
-    std::set<unsigned long long int> prefetch_addr_set;
-
     // get width
     std::vector<int> width_indices = ghb.get_chained_entries_by_addr(addr, PREFETCH_WIDTH);
 
@@ -51,25 +49,19 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
       for (int j = 0; j < PREFETCH_DEPTH; j++) {
         ghb_entry_t entry = ghb.get_entry_by_index((index + 1 + j) % GHB_LENGTH);
         if (entry.addr != 0) {
-          prefetch_addr_set.insert(entry.addr);
+          std::string str1 = std::to_string(addr);
+          std::string str2 = std::to_string(entry.addr);
+          std::string concatenated = str1 + ", " + str2;
+          auto it = one_degree_pattern_count.find(concatenated);
+          if (it != one_degree_pattern_count.end())
+          {
+            one_degree_hit_count[concatenated]++;
+          }
+          l2_prefetch_line(0, addr, entry.addr, FILL_L2);      
         }
       }
-    }
-
-
-    for (int prefetch_addr : prefetch_addr_set) {
-      std::string str1 = std::to_string(addr);
-      std::string str2 = std::to_string(prefetch_addr);
-      std::string concatenated = str1 + ", " + str2;
-      auto it = one_degree_pattern_count.find(concatenated);
-      if (it != one_degree_pattern_count.end())
-      {
-        one_degree_hit_count[concatenated]++;
-      }
-
-      int result = l2_prefetch_line(0, addr, prefetch_addr, FILL_L2);
-      pf_success_count[result]++;
-    }
+    }      
+  
   }
 
   return;
