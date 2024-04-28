@@ -3,7 +3,7 @@
 #include "ghb.cc"
 #include <set>
 
-#define GHB_LENGTH 10000
+#define GHB_LENGTH 2048
 #define PREFETCH_WIDTH 4
 #define PREFETCH_DEPTH 4
 
